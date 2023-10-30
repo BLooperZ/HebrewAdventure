@@ -31,7 +31,8 @@ jobs:
         GH_TOKEN: ${{ github.token }}
       run: |
         base_branch=test_auto_update
-        
+
+        git config --global core.autocrlf input
         git config --global user.email "${{ github.actor }}@users.noreply.github.com"
         git config --global user.name "${{ github.actor }}"
         git fetch origin $base_branch
@@ -55,11 +56,11 @@ jobs:
 
           python -m sci.tradusci_import -t PATCHES > /dev/null
 
-          # Add and commit changes
+          # Add and commit changes, skip if there are no changes
           git add PATCHES messages.csv
 
           message="$basename: update translation"
-          git commit -m "$message"
+          git commit -m "$message" || continue
 
           # Force push changes to the same branch, replacing any existing commits
           git push --force origin HEAD:$new_branch
